@@ -1,12 +1,12 @@
 const express = require('express')
-  , logger = require('morgan')
-  , session = require('express-session')
-  , bodyParser = require('body-parser')
-  , path = require('path')
-  , Twitter = require('twitter')
-  , Grant = require('grant-express')
-  , RedisStore = require('connect-redis')(session)
-  , { REDIS_URL, SESSION_TTL, SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
+const logger = require('morgan')
+const session = require('express-session')
+const bodyParser = require('body-parser')
+const path = require('path')
+const Twitter = require('twitter')
+const Grant = require('grant-express')
+const RedisStore = require('connect-redis')(session)
+const { REDIS_URL, SESSION_TTL, SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
 
 const createClient = (access_token_key, access_token_secret) => {
   return new Twitter({
@@ -45,7 +45,6 @@ app.use(session({
   secret: SESSION_SECRET,
   cookie: { secure: true },
   store: new RedisStore({
-    ttl: parseInt(SESSION_TTL),
     url: REDIS_URL
   })
 }))
