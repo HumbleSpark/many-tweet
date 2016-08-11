@@ -23,7 +23,12 @@ view =
                 , target "_blank"
                 ]
                 [ text "HumbleSpark" ]
-            , span [] [ text " for the benefit of the Twitter community." ]
+            , span [] [ text " for the benefit of the Twitter community. It is entirely open source and all source code can be found " ]
+            , a
+                [ href "https://github.com/humblespark/many-tweet"
+                , target "_blank"
+                ]
+                [ text "here." ]
             ]
         , h2 [] [ text "Found a Bug?" ]
         , p [ class [ AboutText ] ]
