@@ -153,7 +153,7 @@ app.get('/handle_twitter_callback', function (req, res) {
       req.session.user = {
         id: user.id_str,
         username: user.screen_name,
-        image: user.profile_image_url,
+        image: user.profile_image_url_https,
         color : '#' + user.profile_link_color
       }
       res.send(callbackHtml(req.session.user))
