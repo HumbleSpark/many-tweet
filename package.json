@@ -16,13 +16,13 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "connect-redis": "^3.1.0",
     "elm": "0.17.1",
     "elm-css": "0.5.1",
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "grant-express": "^3.6.3",
     "morgan": "^1.7.0",
-    "session-memory-store": "^0.2.2",
     "twitter": "^1.4.0"
   },
   "engines": {
