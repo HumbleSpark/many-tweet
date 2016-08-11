@@ -46,7 +46,13 @@ app.use(session({
 }))
 app.use(grant)
 app.use(bodyParser.json())
-
+app.use((req, res, next) => {
+  if(req.header('x-forwarded-proto') !== PROTOCOL) {
+    res.redirect(`${PROTOCOL}://${req.header('host')}${req.url}`)
+  } else {
+    next()
+  }
+})
 
 app.post('/post_tweets', (req, res) => {
   if (!req.session.auth) {
