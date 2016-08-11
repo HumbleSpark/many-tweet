@@ -8,13 +8,22 @@
     "build:js": "elm-make ./src/Main.elm --output ./build/main.js",
     "build:css": "elm-css ./src/Stylesheets.elm --output ./build",
     "build": "npm run build:js && npm run build:css",
-    "watch": "elm-package install --yes && nodemon --exec \"npm run build\" -e elm"
+    "watch": "elm-package install --yes && nodemon --exec \"npm run build\" -e elm",
+    "start": "npm run build && node ./server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-    "twitter": "^1.4.0"
+    "twitter": "^1.4.0",
+    "express-session": "^1.14.0",
+    "grant-express": "^3.6.3",
+    "morgan": "^1.7.0",
+    "elm": "0.17.1",
+    "elm-css": "0.5.1"
+  },
+  "engines": {
+    "node": "6.2.2"
   }
 }
