@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:js": "elm-make ./src/Main.elm --output ./build/main.js",
+    "build:js": "elm-make ./src/Main.elm --output ./build/main.js --yes",
     "build:css": "elm-css ./src/Stylesheets.elm --output ./build",
     "build": "npm run build:js && npm run build:css",
     "watch": "elm-package install --yes && nodemon --exec \"npm run build\" -e elm",

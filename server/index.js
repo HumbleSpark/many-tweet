@@ -5,12 +5,12 @@ const express = require('express')
   , path = require('path')
   , Twitter = require('twitter')
   , Grant = require('grant-express')
-  , { sessionSecret, consumer_key, consumer_secret, protocol, host, port } = require('./config')
+  , { SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = require('./config')
 
 const createClient = (access_token_key, access_token_secret) => {
   return new Twitter({
-    consumer_key,
-    consumer_secret,
+    consumer_key: CONSUMER_KEY,
+    consumer_secret: CONSUMER_SECRET,
     access_token_key,
     access_token_secret
   })
@@ -27,12 +27,12 @@ const post = (client, url, params) => {
 
 const grant = new Grant({
   server: {
-    protocol,
-    host
+    protocol: PROTOCOL,
+    host: HOST
   },
   twitter: {
-    key: consumer_key,
-    secret: consumer_secret,
+    key: CONSUMER_KEY,
+    secret: CONSUMER_SECRET,
     callback: '/handle_twitter_callback'
   }
 })
@@ -41,8 +41,8 @@ var app = express()
 app.use(express.static(path.join(__dirname, '../build')))
 app.use(logger('dev'))
 app.use(session({
-  secret: sessionSecret,
-  secure: protocol === 'https'
+  secret: SESSION_SECRET,
+  secure: PROTOCOL === 'https'
 }))
 app.use(grant)
 app.use(bodyParser.json())
@@ -97,17 +97,6 @@ app.post('/post_tweets', (req, res) => {
   }
 })
 
-app.get('/user', (req, res) => {
-  if (!req.session.auth) {
-    res.sendStatus(403)
-    return
-  }
-  const { access_token, access_secret } = req.session.auth
-
-  const twitter = createClient(access_token, access_secret)
-  res.sendStatus(204)
-})
-
 
 const callbackHtml = (user) => {
   return `<!DOCTYPE html>
@@ -117,7 +106,7 @@ const callbackHtml = (user) => {
   </head>
   <body>
     <script>
-      window.opener.postMessage(${JSON.stringify(user)}, '${protocol}://${host}')
+      window.opener.postMessage(${JSON.stringify(user)}, '${PROTOCOL}://${HOST}')
       window.close()
     </script>
   </body>
@@ -182,6 +171,6 @@ app.get('/', (req, res) => {
   )
 })
 
-app.listen(port, function() {
-  console.log('Express server listening on port ' + port)
+app.listen(PORT, function() {
+  console.log('Express server listening on port ' + PORT)
 })
