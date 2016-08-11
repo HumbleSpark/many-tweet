@@ -5,8 +5,11 @@ const bodyParser = require('body-parser')
 const path = require('path')
 const Twitter = require('twitter')
 const Grant = require('grant-express')
+const url = require('url')
 const RedisStore = require('connect-redis')(session)
 const { REDIS_URL, SESSION_TTL, SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
+
+const redisInfo = url.parse(REDIS_URL)
 
 const createClient = (access_token_key, access_token_secret) => {
   return new Twitter({
@@ -45,7 +48,9 @@ app.use(session({
   secret: SESSION_SECRET,
   cookie: { secure: true },
   store: new RedisStore({
-    url: REDIS_URL
+    host: redisInfo.hostname,
+    port: redisInfo.port,
+    auth_pass: redisInfo.auth.split(':')[1]
   })
 }))
 app.use(grant)
