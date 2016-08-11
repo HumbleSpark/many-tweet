@@ -88,21 +88,24 @@ app.post('/post_tweets', (req, res) => {
           res.json({ tweetId: ids[0] })
         })
         .catch((e) => {
-          console.error(e.stack)
+          console.log('inner error')
+          console.log(e)
           return Promise.all(ids.map((nextId) => {
-            console.log(nextId)
             return post(client, `statuses/destroy/${nextId}`, { trim_user: true })
           }))
           .then(() => {
             res.sendStatus(500)
           })
           .catch((e2) => {
-            console.error(e2.stack);
+            console.log('innermost error')
+            console.log(e2.stack)
             res.sendStatus(500)
           })
         })
     } catch (e) {
-      console.error(e.stack)
+      console.log('outer error')
+      console.log(e)
+      throw e
     }
   }
 })
@@ -183,9 +186,10 @@ app.get('/', (req, res) => {
 
 app.use((error, req, res, next) => {
   if (error) {
-    console.error(error.stack);
+    console.log('middleware error')
+    console.log(error)
   }
-  next(error);
+  next(error)
 });
 
 app.listen(PORT, function() {
