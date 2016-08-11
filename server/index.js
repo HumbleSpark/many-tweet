@@ -44,7 +44,6 @@ app.use(express.static(path.join(__dirname, '../build')))
 app.use(logger('dev'))
 app.use(session({
   secret: SESSION_SECRET,
-  cookie: { secure: true },
   store: new MemoryStore({
     expires: parseInt(SESSION_TTL),
     checkperiod: parseInt(SESSION_CHECK_PERIOD)
