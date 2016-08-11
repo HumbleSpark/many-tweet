@@ -65,8 +65,8 @@ app.post('/post_tweets', (req, res) => {
     return
   }
 
-  const { access_token, access_secret } = req.session.auth
-  const client = createClient(access_token, access_secret)
+  const { token, secret } = req.session.auth
+  const client = createClient(token, secret)
 
   const tweets = req.body.tweets;
   if (tweets.length === 0) {
@@ -145,7 +145,11 @@ app.get('/handle_twitter_callback', function (req, res) {
     if (error) {
       res.send(callbackHtml(null))
     } else {
-      req.session.auth = req.query
+      req.session.auth = {
+        token: req.query.access_token,
+        secret: req.query.access_secret
+      }
+
       req.session.user = {
         id: user.id_str,
         username: user.screen_name,
