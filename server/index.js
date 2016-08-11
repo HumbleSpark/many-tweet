@@ -68,38 +68,42 @@ app.post('/post_tweets', (req, res) => {
     res.sendStatus(400)
     return
   } else {
-    let ids = []
-    const promise = tweets.reduce((promise, nextTweet) => {
-      return promise.then((tweet) => {
-        return post(client, 'statuses/update', {
-          status: nextTweet,
-          in_reply_to_status_id: tweet ? tweet.id_str : undefined
+    try {
+      let ids = []
+      const promise = tweets.reduce((promise, nextTweet) => {
+        return promise.then((tweet) => {
+          return post(client, 'statuses/update', {
+            status: nextTweet,
+            in_reply_to_status_id: tweet ? tweet.id_str : undefined
+          })
+          .then((newTweet) => {
+            ids.push(newTweet.id_str)
+            return newTweet
+          })
         })
-        .then((newTweet) => {
-          ids.push(newTweet.id_str)
-          return newTweet
-        })
-      })
-    }, Promise.resolve())
+      }, Promise.resolve())
 
-    console.log(ids)
-
-    promise
-      .then(() => {
-        res.json({ tweetId: ids[0] })
-      })
-      .catch((e) => {
-        return Promise.all(ids.map((nextId) => {
-          console.log(nextId)
-          return post(client, `statuses/destroy/${nextId}`, { trim_user: true })
-        }))
+      promise
         .then(() => {
-          res.sendStatus(500)
+          res.json({ tweetId: ids[0] })
         })
-        .catch(() => {
-          res.sendStatus(500)
+        .catch((e) => {
+          console.error(e.stack)
+          return Promise.all(ids.map((nextId) => {
+            console.log(nextId)
+            return post(client, `statuses/destroy/${nextId}`, { trim_user: true })
+          }))
+          .then(() => {
+            res.sendStatus(500)
+          })
+          .catch((e2) => {
+            console.error(e2.stack);
+            res.sendStatus(500)
+          })
         })
-      })
+    } catch (e) {
+      console.error(e.stack)
+    }
   }
 })
 
@@ -181,7 +185,7 @@ app.use((error, req, res, next) => {
   if (error) {
     console.error(error.stack);
   }
-  next();
+  next(error);
 });
 
 app.listen(PORT, function() {
