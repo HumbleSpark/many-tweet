@@ -5,7 +5,9 @@ const express = require('express')
   , path = require('path')
   , Twitter = require('twitter')
   , Grant = require('grant-express')
-  , { SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
+  , redis = require('redis')
+  , RedisStore = require('connect-redis')(session)
+  , { REDIS_URL, SESSION_TTL, SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
 
 const createClient = (access_token_key, access_token_secret) => {
   return new Twitter({
@@ -42,7 +44,11 @@ app.use(express.static(path.join(__dirname, '../build')))
 app.use(logger('dev'))
 app.use(session({
   secret: SESSION_SECRET,
-  secure: PROTOCOL === 'https'
+  cookie: { secure: true },
+  store: new RedisStore({
+    ttl: parseInt(SESSION_TTL),
+    client: redis.createClient(REDIS_URL)
+  })
 }))
 app.use(grant)
 app.use(bodyParser.json())
