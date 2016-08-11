@@ -5,7 +5,7 @@ const express = require('express')
   , path = require('path')
   , Twitter = require('twitter')
   , Grant = require('grant-express')
-  , { SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = require('./config')
+  , { SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
 
 const createClient = (access_token_key, access_token_secret) => {
   return new Twitter({
