@@ -11,6 +11,12 @@ const { REDIS_URL, SESSION_TTL, SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, P
 
 const redisInfo = url.parse(REDIS_URL)
 
+const redisStore = new RedisStore({
+  url: REDIS_URL
+})
+
+console.log(redisStore)
+
 const createClient = (access_token_key, access_token_secret) => {
   return new Twitter({
     consumer_key: CONSUMER_KEY,
@@ -47,11 +53,7 @@ app.use(logger('dev'))
 app.use(session({
   secret: SESSION_SECRET,
   cookie: { secure: true },
-  store: new RedisStore({
-    host: redisInfo.hostname,
-    port: redisInfo.port,
-    auth_pass: redisInfo.auth.split(':')[1]
-  })
+  store: redisStore
 }))
 app.use(grant)
 app.use(bodyParser.json())
