@@ -5,7 +5,6 @@ const express = require('express')
   , path = require('path')
   , Twitter = require('twitter')
   , Grant = require('grant-express')
-  , redis = require('redis')
   , RedisStore = require('connect-redis')(session)
   , { REDIS_URL, SESSION_TTL, SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
 
@@ -47,7 +46,7 @@ app.use(session({
   cookie: { secure: true },
   store: new RedisStore({
     ttl: parseInt(SESSION_TTL),
-    client: redis.createClient(REDIS_URL)
+    url: REDIS_URL
   })
 }))
 app.use(grant)
