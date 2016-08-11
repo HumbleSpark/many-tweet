@@ -177,6 +177,13 @@ app.get('/', (req, res) => {
   )
 })
 
+app.use((error, req, res, next) => {
+  if (error) {
+    console.error(error.stack);
+  }
+  next();
+});
+
 app.listen(PORT, function() {
   console.log('Express server listening on port ' + PORT)
 })
