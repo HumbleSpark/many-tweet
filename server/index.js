@@ -44,7 +44,6 @@ app.use(express.static(path.join(__dirname, '../build')))
 app.use(logger('dev'))
 app.use(session({
   secret: SESSION_SECRET,
-  cookie: { path: '/', httpOnly: true, secure: true, maxAge: null },
   store: new RedisStore({
     ttl: parseInt(SESSION_TTL),
     url: REDIS_URL
