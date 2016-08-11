@@ -9,7 +9,8 @@
     "build:css": "elm-css ./src/Stylesheets.elm --output ./build",
     "build": "npm run build:js && npm run build:css",
     "watch": "elm-package install --yes && nodemon --exec \"npm run build\" -e elm",
-    "start": "npm run build && node ./server"
+    "postinstall": "npm run build",
+    "start": "node ./server"
   },
   "author": "",
   "license": "ISC",
