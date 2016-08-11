@@ -9,7 +9,7 @@ port module Screens.Login.Update
 import Json.Decode as Decode exposing (Decoder, Value)
 import Application.Messaging exposing (AppContext, AppMsg(..), User, userDecoder)
 import Shared.Pages as Pages exposing (Page(..))
-import Screens.Login.Model as Model exposing (Model)
+import Screens.Login.Model as Model exposing (Model, LoggingInState(..))
 
 
 type Msg
@@ -50,7 +50,7 @@ update context msg model =
                 , NoneAppMsg
                 )
             else
-                ( model
+                ( { model | loggingInState = Waiting }
                 , loginStart ()
                 , NoneAppMsg
                 )
@@ -58,13 +58,13 @@ update context msg model =
         LoginComplete userMaybe ->
             case userMaybe of
                 Just user ->
-                    ( model
+                    ( { model | loggingInState = Success }
                     , Pages.redirectTo ComposePage
                     , LoginAppMsg user
                     )
 
                 Nothing ->
-                    ( model
+                    ( { model | loggingInState = Failure }
                     , Cmd.none
                     , LogoutAppMsg
                     )
