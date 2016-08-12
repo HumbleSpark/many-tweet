@@ -1,7 +1,6 @@
 module Workers.App.Update exposing (Msg, update, encoder, decoder)
 
 import Json.Decode as Decode
-import Json.Decode.Pipeline as Decode
 import Shared.Json.DecodeExts as Decode
 import Json.Encode as Encode
 import Shared.Json.EncodeExts as Encode
@@ -42,9 +41,9 @@ decoder =
         <| \ctor ->
             case ctor of
                 "Hello" ->
-                    Decode.decode Hello
-                        |> Decode.required "0" Decode.int
-                        |> Decode.required "1" Decode.string
+                    Decode.tuple2 Hello
+                        Decode.int
+                        Decode.string
 
                 _ ->
                     Decode.succeed NoOp
