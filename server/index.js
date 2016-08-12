@@ -161,7 +161,7 @@ app.get('/handle_twitter_callback', function (req, res) {
 })
 
 
-app.get('/', (req, res) => {
+app.get('/*', (req, res) => {
   res.send(
 `<!DOCTYPE html>
 <html>
@@ -172,6 +172,7 @@ app.get('/', (req, res) => {
     <link rel="stylesheet" href="main.css" />
   </head>
   <body>
+    <div id="app"></div>
     <script src="main.js"></script>
   </body>
 </html>

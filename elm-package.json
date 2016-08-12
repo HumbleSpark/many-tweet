@@ -15,6 +15,7 @@
         "elm-lang/svg": "1.1.1 <= v < 2.0.0",
         "evancz/url-parser": "1.0.0 <= v < 2.0.0",
         "lukewestby/elm-http-builder": "2.0.0 <= v < 3.0.0",
+        "lukewestby/worker": "2.0.0 <= v < 3.0.0",
         "rtfeldman/elm-css": "4.0.2 <= v < 5.0.0",
         "rtfeldman/elm-css-helpers": "2.0.0 <= v < 3.0.0"
     },
