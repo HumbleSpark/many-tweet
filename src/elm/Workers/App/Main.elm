@@ -5,6 +5,7 @@ import Shared.Json.DecodeExts as Decode
 import Worker
 import Workers.App.Model as Model
 import Workers.App.Update as Update
+import Workers.App.Msg as Msg
 
 
 port messages : (Decode.Value -> msg) -> Sub msg
@@ -18,5 +19,5 @@ main =
     Worker.program (Model.encoder >> model)
         { update = Update.update
         , init = ( Model.model, Cmd.none )
-        , subscriptions = \_ -> messages (Decode.decodeUnsafe Update.decoder)
+        , subscriptions = \_ -> messages (Decode.decodeUnsafe Msg.decoder)
         }
