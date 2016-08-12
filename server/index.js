@@ -7,12 +7,12 @@ const Twitter = require('twitter')
 const Grant = require('grant-express')
 const url = require('url')
 const RedisStore = require('connect-redis')(session)
-const { REDIS_URL, SESSION_TTL, SESSION_SECRET, CONSUMER_KEY, CONSUMER_SECRET, PROTOCOL, HOST, PORT } = process.env
+const config = require('./config')()
 
 const createClient = (access_token_key, access_token_secret) => {
   return new Twitter({
-    consumer_key: CONSUMER_KEY,
-    consumer_secret: CONSUMER_SECRET,
+    consumer_key: config.consumerKey,
+    consumer_secret: config.consumerSecret,
     access_token_key,
     access_token_secret
   })
@@ -29,35 +29,44 @@ const post = (client, url, params) => {
 
 const grant = new Grant({
   server: {
-    protocol: PROTOCOL,
-    host: HOST
+    protocol: config.protocol,
+    host: config.grantHost
   },
   twitter: {
-    key: CONSUMER_KEY,
-    secret: CONSUMER_SECRET,
+    key: config.consumerKey,
+    secret: config.consumerSecret,
     callback: '/handle_twitter_callback'
   }
 })
 
+const sessionConfig = process.env.NODE_ENV === 'production' ?
+  {
+    secret: config.sessionSecret,
+    store: new RedisStore({
+      ttl: parseInt(config.sessionTtl),
+      url: config.redisUrl
+    })
+  } :
+  {
+    secret: config.sessionSecret
+  }
+
 var app = express()
 app.use(express.static(path.join(__dirname, '../build')))
 app.use(logger('dev'))
-app.use(session({
-  secret: SESSION_SECRET,
-  store: new RedisStore({
-    ttl: parseInt(SESSION_TTL),
-    url: REDIS_URL
-  })
-}))
+app.use(session(sessionConfig))
 app.use(grant)
 app.use(bodyParser.json())
-app.use((req, res, next) => {
-  if(req.header('x-forwarded-proto') !== PROTOCOL) {
-    res.redirect(`${PROTOCOL}://${req.header('host')}${req.url}`)
-  } else {
-    next()
-  }
-})
+
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if(req.header('x-forwarded-proto') !== config.protocol) {
+      res.redirect(`${config.protocol}://${req.header('host')}${req.url}`)
+    } else {
+      next()
+    }
+  })
+}
 
 app.post('/post_tweets', (req, res) => {
   if (!req.session.auth) {
@@ -73,46 +82,36 @@ app.post('/post_tweets', (req, res) => {
     res.sendStatus(400)
     return
   } else {
-    try {
-      let ids = []
-      const promise = tweets.reduce((promise, nextTweet) => {
-        return promise.then((tweet) => {
-          return post(client, 'statuses/update', {
-            status: nextTweet,
-            in_reply_to_status_id: tweet ? tweet.id_str : undefined
-          })
-          .then((newTweet) => {
-            ids.push(newTweet.id_str)
-            return newTweet
-          })
+    const ids = []
+    const promise = tweets.reduce((promise, nextTweet) => {
+      return promise.then((tweet) => {
+        return post(client, 'statuses/update', {
+          status: nextTweet,
+          in_reply_to_status_id: tweet ? tweet.id_str : undefined
         })
-      }, Promise.resolve())
+        .then((newTweet) => {
+          ids.push(newTweet.id_str)
+          return newTweet
+        })
+      })
+    }, Promise.resolve())
 
-      promise
+    promise
+      .then(() => {
+        res.json({ tweetId: ids[0] })
+      })
+      .catch(() => {
+        return Promise.all(ids.map((nextId) => {
+          return post(client, `statuses/destroy/${nextId}`, { trim_user: true })
+        }))
         .then(() => {
-          res.json({ tweetId: ids[0] })
+          res.sendStatus(500)
         })
-        .catch((e) => {
-          console.log('inner error')
-          console.log(e)
-          return Promise.all(ids.map((nextId) => {
-            return post(client, `statuses/destroy/${nextId}`, { trim_user: true })
-          }))
-          .then(() => {
-            res.sendStatus(500)
-          })
-          .catch((e2) => {
-            console.log('innermost error')
-            console.log(e2.stack)
-            res.sendStatus(500)
-          })
+        .catch(() => {
+          res.sendStatus(500)
         })
-    } catch (e) {
-      console.log('outer error')
-      console.log(e)
-      throw e
+      })
     }
-  }
 })
 
 
@@ -124,7 +123,7 @@ const callbackHtml = (user) => {
   </head>
   <body>
     <script>
-      window.opener.postMessage(${JSON.stringify(user)}, '${PROTOCOL}://${HOST}')
+      window.opener.postMessage(${JSON.stringify(user)}, '${config.protocol}://${config.grantHost}')
       window.close()
     </script>
   </body>
@@ -193,14 +192,6 @@ app.get('/', (req, res) => {
   )
 })
 
-app.use((error, req, res, next) => {
-  if (error) {
-    console.log('middleware error')
-    console.log(error)
-  }
-  next(error)
-});
-
-app.listen(PORT, function() {
-  console.log('Express server listening on port ' + PORT)
+app.listen(config.port, function() {
+  console.log('Express server listening on port ' + config.port)
 })
