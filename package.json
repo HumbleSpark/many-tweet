@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:js": "elm-make ./src/Main.elm --output ./build/main.js --yes",
-    "build:css": "elm-css ./src/Stylesheets.elm --output ./build",
-    "build": "npm run build:js && npm run build:css",
-    "watch": "elm-package install --yes && nodemon --exec \"npm run build\" -e elm",
+    "build": "webpack --config ./webpack.config.js",
+    "watch": "webpack --progress --colors --watch --config ./webpack.config.js",
     "postinstall": "npm run build",
     "start": "node ./server"
   },
@@ -22,10 +20,23 @@
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "grant-express": "^3.6.3",
+    "material-ui": "^0.15.4",
     "morgan": "^1.7.0",
+    "react": "^15.3.0",
+    "react-dom": "^15.3.0",
+    "react-router": "^2.6.1",
+    "react-tap-event-plugin": "^1.0.0",
     "twitter": "^1.4.0"
   },
   "engines": {
     "node": "6.2.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.13.2",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.13.2",
+    "babel-preset-react": "^6.11.1",
+    "elm-webpack-loader": "^3.0.5",
+    "webpack": "^1.13.1"
   }
 }

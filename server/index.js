@@ -173,19 +173,6 @@ app.get('/', (req, res) => {
   </head>
   <body>
     <script src="main.js"></script>
-    <script>
-      var app = Elm.Main.fullscreen({
-        user: ${JSON.stringify(req.session.user || null)}
-      })
-
-      window.addEventListener('message', function(e) {
-        app.ports.loginCompleteRaw.send(e.data)
-      })
-
-      app.ports.loginStart.subscribe(function() {
-        window.open('/connect/twitter')
-      })
-    </script>
   </body>
 </html>
 `
